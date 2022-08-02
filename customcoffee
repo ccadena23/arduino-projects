@@ -1,0 +1,58 @@
+#include <LiquidCrystal.h> // import the LCD library
+#include <Stepper.h> // import the stepper library
+
+LiquidCrystal lcd(13, 12, 11, 10, 9, 8); // define LCD pins
+Stepper motor(100, 1, 2, 3, 4); // define stepper pins
+const int tempPin = A0; // define temp pin
+#define contra 9 // define pin that controls the contrast of the screen
+#define bri 10 // define pin the controls the brightness of the screen
+const int button = 5; // define button pin
+float temp = 100.0; // define temp variable
+
+void setup() {
+  lcd.begin(16, 2); // tells LCD size
+  pinMode(contra, OUTPUT); // init contrast pin as OUTPUT
+  pinMode(bri, OUTPUT); // init brightness pin as OUTPUT
+  digitalWrite(contra, LOW); // set contrast to LOW
+  pinMode(tempPin, INPUT); // init temperature as INPUT
+  pinMode(buttonPin, INPUT); // init button as INPUT
+  Serial.begin(9600);
+}
+
+void loop() {
+  analogWrite(bri, 0); // set screen to off
+  // put your main code here, to run repeatedly:
+  if digitalRead(button) == HIGH { // check to see if button has been pressed
+    analogWrite(bri, 200); // turn on screen
+    lcd.setCursor(0, 0); // do some LCD screenwriting
+    lcd.print("Place mug below");
+    lcd.setCursor(0, 1);
+    lcd.print("ON  5");
+    delay(1000);
+    lcd.print("ON  4");
+    delay(1000);
+    lcd.print("ON  3");
+    delay(1000);
+    lcd.print("ON  2");
+    delay(1000);
+    lcd.print("ON  1");
+    delay(1000);
+    lcd.clear();
+    lcd.setCursor(0, 0)
+    lcd.print("Reading temp...");
+    cd.setCursor(0, 1);
+
+    while temp > 30 { // while the temp is higher than 30 C
+      motor.step(1); // spin motor
+      temp = analogRead(tempPin); // check temperature
+      temp = (temp *5.0*100.0)/1024.0; // calculate temp in C
+      lcd.print(temp); // print temp on screen 
+      motor.step(3);
+      delay(10); // delay for stability
+    }
+
+    lcd.print("Coffee done!"); // LCD screenwriting when done
+    lcd.setCursor(0, 1);
+    lcd.print("enjoy!")
+  }
+}
